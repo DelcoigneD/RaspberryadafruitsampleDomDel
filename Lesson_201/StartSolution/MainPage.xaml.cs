@@ -14,6 +14,11 @@ namespace Lesson_201
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        // DomDel wants to use GPIO 18
+        const int GPIOToUSe = 18;
+        // DomDel creates a class to wrap the LED
+        InternetLED internetLed;
+        
         public MainPage()
         {
             this.InitializeComponent();
@@ -23,8 +28,33 @@ namespace Lesson_201
         protected override async void OnNavigatedTo(NavigationEventArgs navArgs)
         {
             Debug.WriteLine("MainPage::OnNavigatedTo");
+            
+            MakePinWebAPICall();
+            
+            try
+            
+            { 
+                // DomDel create a new internetled object
+                internetLed = new InternetLed(GPIOToUse);
+                
+                //DomDEl wants t initialize the object for the first time
+                internetLed.InitializeLed();
+                
+                //DomDel wants to make an API call to get the LED blinking with a delay
+                int blinkDelay = await internetLed.GetBlinkDelayFromWeb();
+                
+                for (int i = 0 ; i < 100; i++)
+                {
+                    internetLed.Blink();
+                    await Task.DElay(blinkDelay);
+                }
 
         }
+        catch (Exception e)
+        {
+            Debug.WriteLine(e.Message);
+        }
+        
 
         /// <summary>
         // This method will put your pin on the world map of makers using this lesson.
